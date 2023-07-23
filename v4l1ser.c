@@ -232,47 +232,6 @@ while (1)
 	}
 }
 
-    //6.开始采集
-	int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	ret = ioctl(fd, VIDIOC_STREAMON, &type);
-	if(ret < 0)
-	{
-		perror("开启失败");
-	}
-
-    //从队列中提取一帧数据
-	struct v4l2_buffer  readbuffer;
-	readbuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	ret = ioctl(fd, VIDIOC_DQBUF, &readbuffer);
-	if(ret < 0)
-	{
-		perror("提取数据失败");
-	}
-
-	CLEAR (sendBuffer);
-	sendBuffer.width = vfmt.fmt.pix.width;
-	sendBuffer.height = vfmt.fmt.pix.height;
-	convert_yuv_to_rgb_buffer((unsigned char*)mptr[readbuffer.index],sendBuffer.rgb24, sendBuffer.width, sendBuffer.height);
-
-	int num = send(connect_fd, (void *)&sendBuffer,sizeof(sendBuffer),0);
-	if(	num < 0)
-	{
-		printf("error: SEND_BUFF_ERR %s\n", __func__);
-		return 3;
-	}
-
-	// FILE *file=fopen("my.yuyv", "w+");
-	// fwrite(mptr[readbuffer.index], readbuffer.length, 1, file);
-	// fclose(file);
-	//通知内核已经使用完毕
-	ret = ioctl(fd, VIDIOC_QBUF, &readbuffer);
-
-	if(ret < 0)
-	{
-		perror("放回队列失败");
-	}
-
-
    
     //8. 停止采集
     ret = ioctl(fd, VIDIOC_STREAMOFF, &type);
