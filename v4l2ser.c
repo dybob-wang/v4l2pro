@@ -189,10 +189,12 @@ int main(void)
 			perror("放回失败");
 		}
 	}
+
+//6.开始采集
+	int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 while (1)
 {
-	//6.开始采集
-	int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	
 	ret = ioctl(fd, VIDIOC_STREAMON, &type);
 	if(ret < 0)
 	{
